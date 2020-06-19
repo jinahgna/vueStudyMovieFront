@@ -1,0 +1,50 @@
+{
+	"name": "pxd-vue-starter",
+	"version": "0.1.1",
+	"private": false,
+	"homepage": "http://pxd.co.kr/",
+	"author": {
+		"name": "pxd 4group",
+		"email": "pxd4group@pxd.co.kr",
+		"url": "http://pxd.co.kr/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/pxd-fed/pxd-vue-starter.git"
+	},
+	"scripts": {
+		"serve": "vue-cli-service serve --open",
+		"build": "vue-cli-service build"
+	},
+	"dependencies": {
+		"axios": "^0.19.2",
+		"core-js": "^3.4.4",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
+		"http-proxy-middleware": "^1.0.4",
+		"vue": "^2.6.10",
+		"vue-router": "^3.1.3",
+		"vuex": "^3.1.2"
+	},
+	"devDependencies": {
+		"@vue/cli-plugin-babel": "^4.2.2",
+		"@vue/cli-plugin-eslint": "^4.2.2",
+		"@vue/cli-plugin-router": "^4.2.2",
+		"@vue/cli-plugin-vuex": "^4.2.2",
+		"@vue/cli-service": "^4.2.2",
+		"@vue/eslint-config-airbnb": "^4.0.0",
+		"babel-eslint": "^10.0.3",
+		"eslint": "^6.8.0",
+		"eslint-config-prettier": "^6.10.0",
+		"eslint-plugin-html": "^6.0.0",
+		"eslint-plugin-import": "^2.20.1",
+		"eslint-plugin-prettier": "^3.1.2",
+		"eslint-plugin-vue": "^6.1.2",
+		"prettier": "1.19.1",
+		"vue-template-compiler": "^2.6.10"
+	},
+	"browserslist": [
+		"> 1%",
+		"last 2 versions"
+	]
+}

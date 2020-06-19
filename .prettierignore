@@ -1,0 +1,8 @@
+node_modules/
+package.json
+package-lock.json
+.eslintrc.js
+.eslintignore
+.prettierrc
+babel.config.js
+src/assets/css
