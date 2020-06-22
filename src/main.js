@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import globalFunctions from '@/utils/globalFunction';
-import VueGeolocation from 'vue-browser-geolocation';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -12,7 +11,6 @@ Vue.config.productionTip = false;
 
 // 전역으로 사용될 공통 함수
 Vue.use(globalFunctions);
-Vue.use(VueGeolocation);
 
 new Vue({
 	router,

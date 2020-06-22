@@ -24,7 +24,7 @@
 				</li>
 			</ul>
 		</div>
-		<div id="map"></div>
+		<div id="mapArea"></div>
 	</div>
 </template>
 
@@ -37,11 +37,12 @@ export default {
 	components: {},
 	data() {
 		return {
-			key: 'b12f2221d401b22dda7ce6f92ea46fbb',
+			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
 			searchText: '',
 			searchMovieData: '',
+			mapKey: '1adb5927a691a043afeccb8a25ce1118',
 		};
 	},
 	mounted() {
@@ -56,13 +57,12 @@ export default {
 		// 박스오피스 api 호출
 		async loadView() {
 			const payload = {
-				key: this.key,
+				key: this.boxOfficekey,
 				targetDt: this.todayDate,
 				itemPerPage: '',
 				multiMovieYn: '',
 				repNationCd: '',
 				wideAreaCd: '',
-				map: '',
 			};
 			await this.$store.dispatch(commonActionType.ACTION_BOXOFFICE_LIST, payload);
 			this.boxOfficeData = this.$store.state.movie.boxOfficeListData;
@@ -101,58 +101,53 @@ export default {
 		},
 		// 지도 불러오기1
 		initMap() {
-			const container = document.getElementById('map');
+			const container = document.getElementById('mapArea');
 			const options = { center: new kakao.maps.LatLng(33.450701, 126.570667), level: 3 };
-			this.map = new kakao.maps.Map(container, options); // 마커추가하려면 객체를 아래와 같이 하나 만든다.
-			const marker = new kakao.maps.Marker({ position: this.map.getCenter() });
-			marker.setMap(this.map);
+			const map = new kakao.maps.Map(container, options);
+			const marker = new kakao.maps.Marker({ position: map.getCenter() });
+			const that = this;
 			if (navigator.geolocation) {
 				// GeoLocation을 이용해서 접속 위치를 얻어옵니다
 				// eslint-disable-next-line func-names
 				navigator.geolocation.getCurrentPosition(function(position) {
-					const lat = position.coords.latitude; // 위도
-					const lon = position.coords.longitude; // 경도
-					const locPosition = new kakao.maps.LatLng(lat, lon); // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
-					const message = '<div style="padding:5px;">여기에 계신가요?!</div>'; // 인포윈도우에 표시될 내용입니다
+					// 위도
+					const lat = position.coords.latitude;
+					// 경도
+					const lon = position.coords.longitude;
+					// 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+					const locPosition = new kakao.maps.LatLng(lat, lon);
+					// 인포윈도우에 표시될 내용입니다
+					const message = '<div style="padding:5px;">여기에 계신가요?!</div>';
 					// 마커와 인포윈도우를 표시합니다
-					// eslint-disable-next-line no-undef
-					this.displayMarker(locPosition, message);
+					const currentMarker = new kakao.maps.Marker({
+						map: that.map,
+						position: locPosition,
+					});
+					// 인포윈도우에 표시할 내용
+					const iwContent = message;
+					const iwRemoveable = true;
+					// 인포윈도우를 생성합니다
+					const infowindow = new kakao.maps.InfoWindow({
+						content: iwContent,
+						removable: iwRemoveable,
+					});
+					// 인포윈도우를 마커위에 표시합니다
+					infowindow.open(map, currentMarker);
+					// 지도 중심좌표를 접속위치로 변경합니다
+					map.setCenter(locPosition);
+					marker.setMap(map);
 				});
 			} else {
-				// HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
-				const locPosition = new kakao.maps.LatLng(33.450701, 126.570667);
-				const message = 'geolocation을 사용할수 없어요..';
-				// eslint-disable-next-line no-undef
-				this.displayMarker(locPosition, message);
+				alert('현재위치(geolocation)를 사용할수 없습니다.');
 			}
 		},
 		// 지도 불러오기2
 		addScript() {
-			const script = document.createElement('script'); /* global kakao */
+			/* global kakao */
+			const script = document.createElement('script');
 			script.onload = () => kakao.maps.load(this.initMap);
-			script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=1adb5927a691a043afeccb8a25ce1118';
+			script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${this.mapKey}`;
 			document.head.appendChild(script);
-		},
-		// 지도에 마커와 인포윈도우를 표시하는 함수입니다
-		displayMarker(locPosition, message) {
-			// 마커를 생성합니다
-			const marker = new kakao.maps.Marker({
-				// eslint-disable-next-line no-undef
-				map: this.map,
-				position: locPosition,
-			});
-			const iwContent = message; // 인포윈도우에 표시할 내용
-			const iwRemoveable = true;
-			// 인포윈도우를 생성합니다
-			const infowindow = new kakao.maps.InfoWindow({
-				content: iwContent,
-				removable: iwRemoveable,
-			});
-			// 인포윈도우를 마커위에 표시합니다
-			// eslint-disable-next-line no-undef
-			infowindow.open(map, marker);
-			// 지도 중심좌표를 접속위치로 변경합니다
-			this.map.setCenter(locPosition);
 		},
 	},
 };
@@ -166,7 +161,7 @@ export default {
 img {
 	margin: auto;
 }
-#map {
+#mapArea {
 	width: 500px;
 	height: 500px;
 	margin: auto;
