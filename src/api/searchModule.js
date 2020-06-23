@@ -4,7 +4,8 @@ const searchModule = {};
 // const clientId = 'TZfVxXZdTcuQJxonlOcR';
 // const clientSecret = '5o_ooe3QAt';
 // const baseUrl = 'http://localhost:8300/api';
-const baseUrl = 'http://fed.pxd.co.kr:8300/api';
+// const baseUrl = 'http://fed.pxd.co.kr:8300/api';
+const baseUrl = 'https://vuestudymovieserver-clwlh.run.goorm.io';
 // const express = require('express');
 // const app = express();
 

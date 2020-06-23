@@ -95,9 +95,9 @@ export default {
 			};
 			await this.$store.dispatch(commonActionType.ACTION_SEARCH_MOVIE, payload);
 			// axios
-			this.searchMovieData = this.$store.state.movie.searchMovieData;
+			// this.searchMovieData = this.$store.state.movie.searchMovieData;
 			// request
-			// this.searchMovieData = this.$store.state.movie.searchMovieData.result;
+			this.searchMovieData = this.$store.state.movie.searchMovieData.result;
 		},
 		// 지도 불러오기1
 		initMap() {

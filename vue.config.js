@@ -35,13 +35,22 @@ module.exports = {
 	// 	  }
 	// 	}
 	// }
+	// devServer: {
+	// 	proxy: { 
+	// 		// proxy all requests starting with /api to jsonplaceholder 
+	// 		'/api': { target: 'https://openapi.naver.com',
+	// 		 changeOrigin: true, 
+	// 		 pathRewrite: { '^/api': '' } 
+	// 		} 
+	// 	},
+	// 	https: true
+
+	// }
 	devServer: {
-		proxy: { 
-			// proxy all requests starting with /api to jsonplaceholder 
-			'/api': { target: 'https://openapi.naver.com',
-			 changeOrigin: true, 
-			 pathRewrite: { '^/api': '' } 
-			} 
-		} 
-	}
+		// open: process.platform === 'darwin',
+		// host: '0.0.0.0',
+		// port: 8085, // CHANGE YOUR PORT HERE!
+		// https: true,
+		// hotOnly: false,
+	  },
 };
