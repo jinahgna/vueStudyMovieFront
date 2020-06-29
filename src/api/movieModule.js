@@ -7,7 +7,7 @@ movieModule.getModule = (url, data) => {
 	try {
 		return axios({
 			method: 'get',
-			baseURL: 'https://www.kobis.or.kr/kobisopenapi/webservice/rest' + url,
+			baseURL: `https://www.kobis.or.kr/kobisopenapi/webservice/rest${url}`,
 			// baseURL: baseUrl + url,
 			params: {
 				...data,

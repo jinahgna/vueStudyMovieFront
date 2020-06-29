@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import LayoutDefault from '@/views/layout/LayoutDefault';
-import pageGroup1 from '@router/pageGroup/pageGroup01';
+import pageGroup1 from '@router/pageGroup/pageMovie';
 
 Vue.use(VueRouter);
 

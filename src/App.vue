@@ -26,4 +26,12 @@
 #nav a.router-link-exact-active {
 	color: #42b983;
 }
+html,
+body {
+	margin: 0;
+	height: 100%;
+	overflow-y: auto;
+	background-color: #000;
+	color: #fff;
+}
 </style>

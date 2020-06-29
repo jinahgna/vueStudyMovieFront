@@ -1,30 +1,40 @@
 <template>
 	<div class="movie">
 		<div class="wrap-boxoffice">
+			<div class="recommend-movie">
+				<a v-bind:href="this.rcmMovieData.link">
+					<figure>
+						<img v-bind:src="this.rcmMovieData.image" alt="" />
+					</figure>
+				</a>
+				<h2>
+					<strong v-html="this.rcmMovieData.title"></strong>
+					<em><span>★</span> {{ this.rcmMovieData.userRating }}</em>
+				</h2>
+				<p><span class="title">actor</span> {{ this.rcmMovieData.actor }}</p>
+				<p><span class="title">director</span> {{ this.rcmMovieData.director }}</p>
+			</div>
 			<h2>일별 박스오피스 10</h2>
-			<ul>
+			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list">
+				<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
+					<figure>
+						<img src="" alt="포스터 이미지" />
+					</figure>
+					<span>{{ index + 1 }}</span>
+					<strong>{{ list.movieNm }}</strong>
+					<p>
+						개봉일 : {{ list.openDt }} <br />
+						누적관객수: {{ list.audiAcc }}
+					</p>
+				</swiper-slide>
+			</swiper>
+			<!-- <ul>
 				<li v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
 					<strong>{{ list.movieNm }}</strong>
 					<p>개봉일 : {{ list.openDt }} / 누적관객수: {{ list.audiAcc }}</p>
 				</li>
-			</ul>
+			</ul> -->
 		</div>
-		<div class="wrap-search-movie">
-			<input type="text" v-model="searchText" />
-			<button @click="searchMovie()">영화검색</button>
-			<ul>
-				<li v-for="(list, index) in searchMovieData.items" :key="index">
-					<strong v-html="list.title"></strong>
-					<p>{{ list.actor }}</p>
-					<p>{{ list.director }}</p>
-					<figure>
-						<img v-bind:src="list.image" alt="" />
-					</figure>
-					<a v-bind:href="list.link">바로가기</a>
-				</li>
-			</ul>
-		</div>
-		<div id="mapArea"></div>
 	</div>
 </template>
 
@@ -40,18 +50,34 @@ export default {
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
-			searchText: '',
-			searchMovieData: '',
-			mapKey: '1adb5927a691a043afeccb8a25ce1118',
+			rcmMovieData: '',
+			swiperOption: {
+				effect: 'coverflow',
+				grabCursor: true,
+				centeredSlides: true,
+				slidesPerView: 2,
+				coverflowEffect: {
+					rotate: 50,
+					stretch: 0,
+					depth: 100,
+					modifier: 1,
+				},
+				autoplay: {
+					delay: 2000,
+				},
+			},
 		};
+	},
+	computed: {
+		swiper() {
+			return this.$refs.mySwiper.$swiper;
+		},
 	},
 	mounted() {
 		this.todayDate = new Date();
 		this.todayDate = this.getFormatDate(this.todayDate);
-		console.log('this.todayDate', this.todayDate);
 		this.loadView();
-		// eslint-disable-next-line no-unused-expressions
-		window.kakao && window.kakao.maps ? this.initMap() : this.addScript();
+		this.swiper.slideTo(3, 1000, false);
 	},
 	methods: {
 		// 박스오피스 api 호출
@@ -66,6 +92,7 @@ export default {
 			};
 			await this.$store.dispatch(commonActionType.ACTION_BOXOFFICE_LIST, payload);
 			this.boxOfficeData = this.$store.state.movie.boxOfficeListData;
+			this.recommendMovie(this.boxOfficeData.dailyBoxOfficeList[1].movieNm);
 		},
 		// 날짜 포멧 변환
 		getFormatDate(date) {
@@ -82,11 +109,13 @@ export default {
 			// yyyymmdd 형태생성
 			return `${year}${month}${day}`;
 		},
-		// 영화검색 api 호출
-		async searchMovie() {
+		async recommendMovie(rcmMovie) {
+			if (rcmMovie.includes('#')) {
+				rcmMovie = rcmMovie.replace(/#/g, '');
+			}
 			const payload = {
-				query: this.searchText,
-				display: 100,
+				query: rcmMovie,
+				display: 1,
 				start: 1,
 				genre: '',
 				country: '',
@@ -94,76 +123,94 @@ export default {
 				yearto: '',
 			};
 			await this.$store.dispatch(commonActionType.ACTION_SEARCH_MOVIE, payload);
-			// axios
-			// this.searchMovieData = this.$store.state.movie.searchMovieData;
-			// request
-			this.searchMovieData = this.$store.state.movie.searchMovieData.result;
-		},
-		// 지도 불러오기1
-		initMap() {
-			const container = document.getElementById('mapArea');
-			const options = { center: new kakao.maps.LatLng(33.450701, 126.570667), level: 3 };
-			const map = new kakao.maps.Map(container, options);
-			const marker = new kakao.maps.Marker({ position: map.getCenter() });
-			const that = this;
-			if (navigator.geolocation) {
-				// GeoLocation을 이용해서 접속 위치를 얻어옵니다
-				// eslint-disable-next-line func-names
-				navigator.geolocation.getCurrentPosition(function(position) {
-					// 위도
-					const lat = position.coords.latitude;
-					// 경도
-					const lon = position.coords.longitude;
-					// 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
-					const locPosition = new kakao.maps.LatLng(lat, lon);
-					// 인포윈도우에 표시될 내용입니다
-					const message = '<div style="padding:5px;">여기에 계신가요?!</div>';
-					// 마커와 인포윈도우를 표시합니다
-					const currentMarker = new kakao.maps.Marker({
-						map: that.map,
-						position: locPosition,
-					});
-					// 인포윈도우에 표시할 내용
-					const iwContent = message;
-					const iwRemoveable = true;
-					// 인포윈도우를 생성합니다
-					const infowindow = new kakao.maps.InfoWindow({
-						content: iwContent,
-						removable: iwRemoveable,
-					});
-					// 인포윈도우를 마커위에 표시합니다
-					infowindow.open(map, currentMarker);
-					// 지도 중심좌표를 접속위치로 변경합니다
-					map.setCenter(locPosition);
-					marker.setMap(map);
-				});
-			} else {
-				alert('현재위치(geolocation)를 사용할수 없습니다.');
-			}
-		},
-		// 지도 불러오기2
-		addScript() {
-			/* global kakao */
-			const script = document.createElement('script');
-			script.onload = () => kakao.maps.load(this.initMap);
-			script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${this.mapKey}`;
-			document.head.appendChild(script);
+			// eslint-disable-next-line prefer-destructuring
+			this.rcmMovieData = this.$store.state.movie.searchMovieData.result.items[0];
+			// this.rcmMovieData.actor = this.rcmMovieData.actor.replace(/\|/g, ' ');
+			// this.rcmMovieData.director = this.rcmMovieData.director.replace(/\|/g, ' ');
+
+			// kmdbmovie
+			// const payload = {
+			// 	collection: 'kmdb_new',
+			// 	nation: '대한민국',
+			// 	query: rcmMovie,
+			// 	ServiceKey: '7XOK50823TUP3BYG9E31',
+			// 	listCount: 3,
+			// 	startCount: 1,
+			// };
+			// await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, payload);
+			// this.rcmMovieData = this.$store.state.movie.kmdbSearchMovieData;
+			// console.log('this.rcmMovieData', this.rcmMovieData);
 		},
 	},
 };
 </script>
 
 <style scoped>
-.wrap-boxoffice,
-.wrap-search-movie {
+.recommend-movie {
+	position: relative;
+	padding-bottom: 20px;
+}
+.recommend-movie h2 em {
+	display: inline-block;
+	font-size: 11px;
+	padding-left: 10px;
+	vertical-align: middle;
+	margin-top: -6px;
+}
+.recommend-movie h2 span {
+	color: rgb(255, 217, 0);
+}
+.recommend-movie a {
+	width: 100%;
+}
+.recommend-movie p {
+	margin-top: 5px;
+}
+.title {
+	display: inline-block;
+	padding: 3px;
+	border-radius: 5px;
+	border: 1px solid #fff;
+	color: #fff;
+	font-size: 11px;
+}
+.wrap-boxoffice {
+	text-align: left;
 	padding: 10px;
+	color: #fff;
+}
+.boxoffice-list {
+	padding-top: 35px;
+}
+.boxoffice-list figure {
+	display: block;
+	width: 100%;
+	height: 65vw;
+	border: 1px solid #ddd;
+}
+.boxoffice-list strong {
+	display: block;
+	padding: 7px 0;
+}
+.boxoffice-list span {
+	position: absolute;
+	left: -17px;
+	top: -20px;
+	font-size: 65px;
+	font-weight: 700;
+	opacity: 0.5;
+}
+.boxoffice-list p {
+	font-size: 12px;
+	line-height: 1.2;
+}
+.boxoffice-list .swiper-slide {
+	position: relative;
+}
+.boxoffice-list .swiper-slide-active span {
+	opacity: 1;
 }
 img {
-	margin: auto;
-}
-#mapArea {
-	width: 500px;
-	height: 500px;
 	margin: auto;
 }
 </style>

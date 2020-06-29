@@ -2,16 +2,15 @@ import commonActionType from '@/store/actionsType';
 import commonMutationType from '@/store/mutationsType';
 import movieModule from '@/api/movieModule';
 import searchModule from '@/api/searchModule';
+import kmdbSearchModule from '@/api/kmdbSearchModule';
 
 const actions = {
 	/**
-	 * @description action 게시판 리스트 조회
+	 * @description action 박스오피스 조회
 	 * @param commit
 	 * @param payload 전달 받은 값
 	 */
-	async [commonActionType.ACTION_BOXOFFICE_LIST]({
-		commit
-	}, payload) {
+	async [commonActionType.ACTION_BOXOFFICE_LIST]({ commit }, payload) {
 		// 방법1
 		try {
 			await movieModule.getModule('/boxoffice/searchDailyBoxOfficeList.json', payload).then((result) => {
@@ -29,13 +28,11 @@ const actions = {
 		// }
 	},
 	/**
-	 * @description action 게시판 리스트 조회
+	 * @description action 네이버 영화검색
 	 * @param commit
 	 * @param payload 전달 받은 값
 	 */
-	async [commonActionType.ACTION_SEARCH_MOVIE]({
-		commit
-	}, payload) {
+	async [commonActionType.ACTION_SEARCH_MOVIE]({ commit }, payload) {
 		try {
 			await searchModule.getModule('/movie', payload).then((result) => {
 				commit(commonMutationType.SET_SEARCH_MOVIE, result.data);
@@ -43,6 +40,21 @@ const actions = {
 			});
 		} catch (e) {
 			console.log('영화 검색 실패');
+		}
+	},
+	/**
+	 * @description action kmdb 영화검색
+	 * @param commit
+	 * @param payload 전달 받은 값
+	 */
+	async [commonActionType.ACTION_KMDB_SEARCH_MOVIE]({ commit }, payload) {
+		try {
+			await kmdbSearchModule.getModule('/kmdbmovie', payload).then((result) => {
+				commit(commonMutationType.SET_KMDB_SEARCH_MOVIE, result.data);
+				console.log('result', result);
+			});
+		} catch (e) {
+			console.log('KMDB 영화 검색 실패');
 		}
 	},
 };
