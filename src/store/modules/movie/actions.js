@@ -43,13 +43,28 @@ const actions = {
 		}
 	},
 	/**
+	 * @description action 박스오피스 네이버 영화검색
+	 * @param commit
+	 * @param payload 전달 받은 값
+	 */
+	async [commonActionType.ACTION_BO_SEARCH_MOVIE]({ commit }, payload) {
+		try {
+			await searchModule.getModule('/boxOfficeMovie', payload).then((result) => {
+				commit(commonMutationType.SET_BO_SEARCH_MOVIE, result.data);
+				console.log('result', result);
+			});
+		} catch (e) {
+			console.log('박스오피스 영화 검색 실패');
+		}
+	},
+	/**
 	 * @description action kmdb 영화검색
 	 * @param commit
 	 * @param payload 전달 받은 값
 	 */
 	async [commonActionType.ACTION_KMDB_SEARCH_MOVIE]({ commit }, payload) {
 		try {
-			await kmdbSearchModule.getModule('/kmdbmovie', payload).then((result) => {
+			await kmdbSearchModule.getModule('/kmdbMovie', payload).then((result) => {
 				commit(commonMutationType.SET_KMDB_SEARCH_MOVIE, result.data);
 				console.log('result', result);
 			});

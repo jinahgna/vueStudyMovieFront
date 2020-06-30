@@ -1,7 +1,7 @@
 <template>
 	<div class="movie">
 		<div class="wrap-boxoffice">
-			<div class="recommend-movie">
+			<!-- <div class="recommend-movie">
 				<a v-bind:href="this.rcmMovieData.link">
 					<figure>
 						<img v-bind:src="this.rcmMovieData.image" alt="" />
@@ -14,6 +14,7 @@
 				<p><span class="title">actor</span> {{ this.rcmMovieData.actor }}</p>
 				<p><span class="title">director</span> {{ this.rcmMovieData.director }}</p>
 			</div>
+			<div class="test" v-html="this.kmdbRcmMovieData.result"></div> -->
 			<h2>일별 박스오피스 10</h2>
 			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list">
 				<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
@@ -50,12 +51,14 @@ export default {
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
-			rcmMovieData: '',
+			rcmMovieData: [],
+			boMovieData: [],
+			kmdbRcmMovieData: '',
 			swiperOption: {
 				effect: 'coverflow',
 				grabCursor: true,
 				centeredSlides: true,
-				slidesPerView: 2,
+				slidesPerView: 1.6,
 				coverflowEffect: {
 					rotate: 50,
 					stretch: 0,
@@ -92,7 +95,25 @@ export default {
 			};
 			await this.$store.dispatch(commonActionType.ACTION_BOXOFFICE_LIST, payload);
 			this.boxOfficeData = this.$store.state.movie.boxOfficeListData;
-			this.recommendMovie(this.boxOfficeData.dailyBoxOfficeList[1].movieNm);
+			// eslint-disable-next-line no-plusplus
+			for (let i = 0; i < 10; i++) {
+				// if (this.boxOfficeData.dailyBoxOfficeList[i].movieNm.includes('#')) {
+				// 	this.boxOfficeData.dailyBoxOfficeList[i].movieNm = this.boxOfficeData.dailyBoxOfficeList[i].movieNm.replace(/#/g, '');
+				// }
+				this.boMovieData.push(this.boxOfficeData.dailyBoxOfficeList[i].movieNm);
+			}
+			// // eslint-disable-next-line no-plusplus
+			// for (let i = 0; i < 10; i++) {
+			this.recommendMovie();
+			// }
+			// // eslint-disable-next-line func-names
+			// this.rcmMovieData.sort(function(a, b) {
+			// 	// 오름차순
+			// 	return a - b;
+			// 	// 1, 2, 3, 4, 10, 11
+			// });
+			// console.log('this.rcmMovieData', this.rcmMovieData);
+			this.recommendMovie02();
 		},
 		// 날짜 포멧 변환
 		getFormatDate(date) {
@@ -109,37 +130,20 @@ export default {
 			// yyyymmdd 형태생성
 			return `${year}${month}${day}`;
 		},
-		async recommendMovie(rcmMovie) {
-			if (rcmMovie.includes('#')) {
-				rcmMovie = rcmMovie.replace(/#/g, '');
-			}
-			const payload = {
-				query: rcmMovie,
-				display: 1,
-				start: 1,
-				genre: '',
-				country: '',
-				yearfrom: '',
-				yearto: '',
+		async recommendMovie() {
+			const payload = this.boMovieData;
+			await this.$store.dispatch(commonActionType.ACTION_BO_SEARCH_MOVIE, payload);
+			console.log('payload', payload);
+			console.log('commonActionType.ACTION_BO_SEARCH_MOVIE', commonActionType.ACTION_BO_SEARCH_MOVIE);
+			this.rcmMovieData = this.$store.state.movie.boSearchMovieData.result;
+		},
+		async recommendMovie02() {
+			const kmdbPayload = {
+				genre: '드라마',
 			};
-			await this.$store.dispatch(commonActionType.ACTION_SEARCH_MOVIE, payload);
-			// eslint-disable-next-line prefer-destructuring
-			this.rcmMovieData = this.$store.state.movie.searchMovieData.result.items[0];
-			// this.rcmMovieData.actor = this.rcmMovieData.actor.replace(/\|/g, ' ');
-			// this.rcmMovieData.director = this.rcmMovieData.director.replace(/\|/g, ' ');
-
-			// kmdbmovie
-			// const payload = {
-			// 	collection: 'kmdb_new',
-			// 	nation: '대한민국',
-			// 	query: rcmMovie,
-			// 	ServiceKey: '7XOK50823TUP3BYG9E31',
-			// 	listCount: 3,
-			// 	startCount: 1,
-			// };
-			// await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, payload);
-			// this.rcmMovieData = this.$store.state.movie.kmdbSearchMovieData;
-			// console.log('this.rcmMovieData', this.rcmMovieData);
+			await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, kmdbPayload);
+			this.kmdbRcmMovieData = this.$store.state.movie.kmdbSearchMovieData.result.Data[0].Result;
+			console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
 		},
 	},
 };
@@ -185,7 +189,7 @@ export default {
 .boxoffice-list figure {
 	display: block;
 	width: 100%;
-	height: 65vw;
+	height: 80vw;
 	border: 1px solid #ddd;
 }
 .boxoffice-list strong {
@@ -212,5 +216,8 @@ export default {
 }
 img {
 	margin: auto;
+}
+.test {
+	color: #fff;
 }
 </style>

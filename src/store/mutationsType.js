@@ -5,6 +5,7 @@
 const movieMutationType = {
 	SET_BOXOFFICE_LIST: 'SET_BOXOFFICE_LIST', // 박스오피스 일별 조회
 	SET_SEARCH_MOVIE: 'SET_SEARCH_MOVIE', // 영화 검색
+	SET_BO_SEARCH_MOVIE: 'SET_BO_SEARCH_MOVIE', // 박스오피스 영화 검색
 	SET_KMDB_SEARCH_MOVIE: 'SET_KMDB_SEARCH_MOVIE', // KMDB 영화 검색
 };
 

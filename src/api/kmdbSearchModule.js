@@ -8,6 +8,11 @@ kmdbSearchModule.getModule = (url, data) => {
 		return axios({
 			method: 'get',
 			baseURL: baseUrl + url,
+			headers: {
+				Pragma: 'no-cache',
+				'Content-Type': 'application/json;charset=UTF-8',
+				'Access-Control-Allow-Origin': '*',
+			},
 			params: {
 				...data,
 			},
