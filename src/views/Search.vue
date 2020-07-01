@@ -13,8 +13,11 @@
 						</figure>
 						<div class="info-txt">
 							<strong v-html="list.title"></strong>
+							<span>{{ list.subtitle }}</span> <br />
+							<span>{{ list.pubDate }}</span>
 							<p>{{ list.actor }}</p>
 							<p>{{ list.director }}</p>
+							<p class="point-color">★{{ list.userRating }}</p>
 						</div>
 					</a>
 				</li>
@@ -56,11 +59,14 @@ export default {
 </script>
 
 <style scoped>
+.info-txt .point-color {
+	color: #e74c3c;
+}
 .search-area {
 	display: flex;
 	justify-content: space-between;
 	margin: 20px auto;
-	border-bottom: 1px solid #fff;
+	border-bottom: 1px solid #e74c3c;
 	width: 80%;
 }
 .search-area input {

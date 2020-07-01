@@ -11,12 +11,12 @@
 						<figure>
 							<img :src="rcmMovieData[index].items[0].image" alt="포스터 이미지" />
 						</figure>
-						<span>{{ index + 1 }}</span>
+						<span class="num point-color">{{ index + 1 }}</span>
 						<strong>{{ list.movieNm }}</strong>
 						<p>
 							개봉일 : {{ list.openDt }} <br />
 							누적관객수: {{ list.audiAcc }} <br />
-							평점: {{ rcmMovieData[index].items[0].userRating }}
+							평점: <span class="point-color">★{{ rcmMovieData[index].items[0].userRating }}</span>
 						</p>
 					</a>
 				</swiper-slide>
@@ -124,6 +124,9 @@ export default {
 	position: relative;
 	padding-bottom: 20px;
 }
+.wrap-boxoffice h2 {
+	padding-left: 20px;
+}
 .recommend-movie h2 em {
 	display: inline-block;
 	font-size: 11px;
@@ -150,7 +153,7 @@ export default {
 }
 .wrap-boxoffice {
 	text-align: left;
-	padding: 10px;
+	padding: 20px 0;
 	color: #fff;
 }
 .boxoffice-list {
@@ -163,26 +166,37 @@ export default {
 }
 .boxoffice-list figure {
 	display: block;
+	position: relative;
 	width: 100%;
 	height: 80vw;
 	border: 1px solid #fff;
 }
+.boxoffice-list figure:after {
+	content: '';
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 80vw;
+	border: 1px solid #ddd;
+	top: 5px;
+	left: 5px;
+}
 .boxoffice-list .swiper-slide-active figure {
-	border: 2px solid #fff;
+	/* border: 2px solid #fff; */
 }
 .boxoffice-list img {
-	width: 60%;
+	width: 110px;
 	padding-top: 15vw;
 }
 .boxoffice-list strong {
 	display: block;
-	padding: 7px 0;
+	padding: 20px 0 10px;
 }
-.boxoffice-list span {
+.boxoffice-list span.num {
 	position: absolute;
 	left: -17px;
-	top: -20px;
-	font-size: 65px;
+	top: -30px;
+	font-size: 85px;
 	font-weight: 700;
 	opacity: 0.5;
 }
@@ -199,8 +213,8 @@ export default {
 img {
 	margin: auto;
 }
-.test {
-	color: #fff;
+.point-color {
+	color: #e74c3c;
 }
 /* loading animation */
 .loader-box {
@@ -241,8 +255,8 @@ img {
 	opacity: 1;
 	-webkit-transform-origin: 100% 0%;
 	transform-origin: 100% 0%;
-	-webkit-animation: loader3 10s ease-in-out infinite;
-	animation: loader3 10s ease-in-out infinite;
+	-webkit-animation: loader3 7s ease-in-out infinite;
+	animation: loader3 7s ease-in-out infinite;
 }
 
 @-webkit-keyframes loader3 {
