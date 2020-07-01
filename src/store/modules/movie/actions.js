@@ -51,7 +51,6 @@ const actions = {
 		try {
 			await searchModule.getModule('/boxOfficeMovie', payload).then((result) => {
 				commit(commonMutationType.SET_BO_SEARCH_MOVIE, result.data);
-				console.log('result', result);
 			});
 		} catch (e) {
 			console.log('박스오피스 영화 검색 실패');
@@ -66,7 +65,6 @@ const actions = {
 		try {
 			await kmdbSearchModule.getModule('/kmdbMovie', payload).then((result) => {
 				commit(commonMutationType.SET_KMDB_SEARCH_MOVIE, result.data);
-				console.log('result', result);
 			});
 		} catch (e) {
 			console.log('KMDB 영화 검색 실패');

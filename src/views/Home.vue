@@ -1,40 +1,26 @@
 <template>
 	<div class="movie">
 		<div class="wrap-boxoffice">
-			<!-- <div class="recommend-movie">
-				<a v-bind:href="this.rcmMovieData.link">
-					<figure>
-						<img v-bind:src="this.rcmMovieData.image" alt="" />
-					</figure>
-				</a>
-				<h2>
-					<strong v-html="this.rcmMovieData.title"></strong>
-					<em><span>★</span> {{ this.rcmMovieData.userRating }}</em>
-				</h2>
-				<p><span class="title">actor</span> {{ this.rcmMovieData.actor }}</p>
-				<p><span class="title">director</span> {{ this.rcmMovieData.director }}</p>
+			<h2>BoxOffice Top10</h2>
+			<div class="loader-box" v-if="!loadFinished">
+				<div class="loader"></div>
 			</div>
-			<div class="test" v-html="this.kmdbRcmMovieData.result"></div> -->
-			<h2>일별 박스오피스 10</h2>
-			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list">
+			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list" v-if="loadFinished">
 				<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
-					<figure>
-						<img src="" alt="포스터 이미지" />
-					</figure>
-					<span>{{ index + 1 }}</span>
-					<strong>{{ list.movieNm }}</strong>
-					<p>
-						개봉일 : {{ list.openDt }} <br />
-						누적관객수: {{ list.audiAcc }}
-					</p>
+					<a :href="rcmMovieData[index].items[0].link">
+						<figure>
+							<img :src="rcmMovieData[index].items[0].image" alt="포스터 이미지" />
+						</figure>
+						<span>{{ index + 1 }}</span>
+						<strong>{{ list.movieNm }}</strong>
+						<p>
+							개봉일 : {{ list.openDt }} <br />
+							누적관객수: {{ list.audiAcc }} <br />
+							평점: {{ rcmMovieData[index].items[0].userRating }}
+						</p>
+					</a>
 				</swiper-slide>
 			</swiper>
-			<!-- <ul>
-				<li v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
-					<strong>{{ list.movieNm }}</strong>
-					<p>개봉일 : {{ list.openDt }} / 누적관객수: {{ list.audiAcc }}</p>
-				</li>
-			</ul> -->
 		</div>
 	</div>
 </template>
@@ -48,12 +34,14 @@ export default {
 	components: {},
 	data() {
 		return {
+			loadFinished: false,
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
-			rcmMovieData: [],
+			link: '',
 			boMovieData: [],
-			kmdbRcmMovieData: '',
+			rcmMovieData: [],
+			kmdbRcmMovieData: [],
 			swiperOption: {
 				effect: 'coverflow',
 				grabCursor: true,
@@ -80,7 +68,6 @@ export default {
 		this.todayDate = new Date();
 		this.todayDate = this.getFormatDate(this.todayDate);
 		this.loadView();
-		this.swiper.slideTo(3, 1000, false);
 	},
 	methods: {
 		// 박스오피스 api 호출
@@ -97,53 +84,36 @@ export default {
 			this.boxOfficeData = this.$store.state.movie.boxOfficeListData;
 			// eslint-disable-next-line no-plusplus
 			for (let i = 0; i < 10; i++) {
-				// if (this.boxOfficeData.dailyBoxOfficeList[i].movieNm.includes('#')) {
-				// 	this.boxOfficeData.dailyBoxOfficeList[i].movieNm = this.boxOfficeData.dailyBoxOfficeList[i].movieNm.replace(/#/g, '');
-				// }
 				this.boMovieData.push(this.boxOfficeData.dailyBoxOfficeList[i].movieNm);
+				if (this.boMovieData[i].includes('#')) {
+					this.boMovieData[i] = this.boMovieData[i].replace(/#/g, '');
+				}
 			}
-			// // eslint-disable-next-line no-plusplus
-			// for (let i = 0; i < 10; i++) {
-			this.recommendMovie();
-			// }
-			// // eslint-disable-next-line func-names
-			// this.rcmMovieData.sort(function(a, b) {
-			// 	// 오름차순
-			// 	return a - b;
-			// 	// 1, 2, 3, 4, 10, 11
-			// });
-			// console.log('this.rcmMovieData', this.rcmMovieData);
-			this.recommendMovie02();
+			this.boSearchMovie();
+			this.kmdbSearchMovie();
 		},
-		// 날짜 포멧 변환
+		// 날짜 포멧 변환 yyyymmdd 형태생성
 		getFormatDate(date) {
-			// yyyy
 			const year = date.getFullYear();
-			// M
 			let month = date.getMonth() + 1;
-			// month 두자리로 저장
 			month = month >= 10 ? month : `0${month}`;
-			// d
 			let day = date.getDate() - 1;
-			// day 두자리로 저장
 			day = day >= 10 ? day : `0${day}`;
-			// yyyymmdd 형태생성
 			return `${year}${month}${day}`;
 		},
-		async recommendMovie() {
+		async boSearchMovie() {
 			const payload = this.boMovieData;
 			await this.$store.dispatch(commonActionType.ACTION_BO_SEARCH_MOVIE, payload);
-			console.log('payload', payload);
-			console.log('commonActionType.ACTION_BO_SEARCH_MOVIE', commonActionType.ACTION_BO_SEARCH_MOVIE);
 			this.rcmMovieData = this.$store.state.movie.boSearchMovieData.result;
+			this.loadFinished = true;
 		},
-		async recommendMovie02() {
+		async kmdbSearchMovie() {
 			const kmdbPayload = {
 				genre: '드라마',
 			};
 			await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, kmdbPayload);
 			this.kmdbRcmMovieData = this.$store.state.movie.kmdbSearchMovieData.result.Data[0].Result;
-			console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
+			// console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
 		},
 	},
 };
@@ -186,11 +156,23 @@ export default {
 .boxoffice-list {
 	padding-top: 35px;
 }
+.boxoffice-list a {
+	display: block;
+	width: 100%;
+	color: #fff;
+}
 .boxoffice-list figure {
 	display: block;
 	width: 100%;
 	height: 80vw;
-	border: 1px solid #ddd;
+	border: 1px solid #fff;
+}
+.boxoffice-list .swiper-slide-active figure {
+	border: 2px solid #fff;
+}
+.boxoffice-list img {
+	width: 60%;
+	padding-top: 15vw;
 }
 .boxoffice-list strong {
 	display: block;
@@ -206,7 +188,7 @@ export default {
 }
 .boxoffice-list p {
 	font-size: 12px;
-	line-height: 1.2;
+	line-height: 1.5;
 }
 .boxoffice-list .swiper-slide {
 	position: relative;
@@ -219,5 +201,83 @@ img {
 }
 .test {
 	color: #fff;
+}
+/* loading animation */
+.loader-box {
+	display: block;
+	text-align: center;
+	margin: 50px 30px;
+	position: relative;
+	transition: all 0.2s ease;
+}
+.loader {
+	display: inline-block;
+	width: 150px;
+	height: 20px;
+}
+.loader:after {
+	content: 'LOADING ...';
+	color: #fff;
+	font-weight: 200;
+	font-size: 16px;
+	position: absolute;
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+	left: 0;
+	top: 0;
+	background-color: #e74c3c;
+	z-index: 1;
+}
+.loader:before {
+	content: '';
+	position: absolute;
+	background-color: #fff;
+	top: -5px;
+	left: 0px;
+	height: 30px;
+	width: 0px;
+	z-index: 0;
+	opacity: 1;
+	-webkit-transform-origin: 100% 0%;
+	transform-origin: 100% 0%;
+	-webkit-animation: loader3 10s ease-in-out infinite;
+	animation: loader3 10s ease-in-out infinite;
+}
+
+@-webkit-keyframes loader3 {
+	0% {
+		width: 0px;
+	}
+	70% {
+		width: 100%;
+		opacity: 1;
+	}
+	90% {
+		opacity: 0;
+		width: 100%;
+	}
+	100% {
+		opacity: 0;
+		width: 0px;
+	}
+}
+
+@keyframes loader3 {
+	0% {
+		width: 0px;
+	}
+	70% {
+		width: 100%;
+		opacity: 1;
+	}
+	90% {
+		opacity: 0;
+		width: 100%;
+	}
+	100% {
+		opacity: 0;
+		width: 0px;
+	}
 }
 </style>

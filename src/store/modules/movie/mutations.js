@@ -41,8 +41,6 @@ const mutations = {
 			if (typeof payload === 'object') {
 				state.boSearchMovieData = payload;
 			}
-			console.log('state:', state);
-			console.log('payload:', payload);
 		} catch (e) {
 			console.error(`[commonMutationType.SET_BO_SEARCH_MOVIE] error: ${e}`);
 		}
