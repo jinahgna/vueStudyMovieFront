@@ -1,17 +1,22 @@
 <template>
 	<div class="search">
 		<div class="wrap-search-movie">
-			<input type="text" v-model="searchText" />
-			<button @click="searchMovie()">영화검색</button>
+			<div class="search-area">
+				<input type="text" v-model="searchText" placeholder="영화 제목을 입력해주세요." />
+				<button @click="searchMovie()"></button>
+			</div>
 			<ul>
 				<li v-for="(list, index) in searchMovieData.items" :key="index">
-					<strong v-html="list.title"></strong>
-					<p>{{ list.actor }}</p>
-					<p>{{ list.director }}</p>
-					<figure>
-						<img v-bind:src="list.image" alt="" />
-					</figure>
-					<a v-bind:href="list.link">바로가기</a>
+					<a v-bind:href="list.link">
+						<figure>
+							<img v-bind:src="list.image" alt="" />
+						</figure>
+						<div class="info-txt">
+							<strong v-html="list.title"></strong>
+							<p>{{ list.actor }}</p>
+							<p>{{ list.director }}</p>
+						</div>
+					</a>
 				</li>
 			</ul>
 		</div>
@@ -51,7 +56,55 @@ export default {
 </script>
 
 <style scoped>
-button {
+.search-area {
+	display: flex;
+	justify-content: space-between;
+	margin: 20px auto;
+	border-bottom: 1px solid #fff;
+	width: 80%;
+}
+.search-area input {
+	background-color: transparent;
+	border: 0;
+	padding: 10px;
 	color: #fff;
+}
+button {
+	width: 30px;
+	height: 30px;
+	background: url(../assets/iconSearch.png) 50% 50% no-repeat;
+	background-size: 25px;
+	color: #fff;
+}
+ul {
+	padding: 20px;
+}
+ul li {
+	color: #fff;
+	border-bottom: 1px solid #3c3c3c;
+	padding: 10px 0;
+}
+ul li a {
+	display: flex;
+	color: #fff;
+}
+ul li figure {
+	width: 110px;
+	margin-right: 10px;
+	background-color: #fff;
+}
+ul li img {
+	max-width: 110px;
+	min-height: 60px;
+}
+.info-txt {
+	width: calc(100% - 120px);
+	text-align: left;
+	font-size: 14px;
+	line-height: 1.5;
+}
+.info-txt p {
+	font-size: 12px;
+	color: #ddd;
 }
 </style>

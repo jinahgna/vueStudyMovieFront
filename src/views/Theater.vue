@@ -21,11 +21,20 @@ export default {
 		window.kakao && window.kakao.maps ? this.initMap() : this.addScript();
 	},
 	methods: {
-		// 지도 불러오기1
+		// 카카도 지도 api script source 등록
+		addScript() {
+			/* global kakao */
+			const script = document.createElement('script');
+			script.onload = () => kakao.maps.load(this.initMap);
+			script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${this.mapKey}&libraries=services`;
+			document.head.appendChild(script);
+		},
+		// 내 현위치 지도 그리기
 		initMap() {
 			const container = document.getElementById('mapArea');
 			const options = { center: new kakao.maps.LatLng(33.450701, 126.570667), level: 3 };
 			const map = new kakao.maps.Map(container, options);
+			const ps = new kakao.maps.services.Places();
 			const marker = new kakao.maps.Marker({ position: map.getCenter() });
 			const that = this;
 			if (navigator.geolocation) {
@@ -58,18 +67,11 @@ export default {
 					// 지도 중심좌표를 접속위치로 변경합니다
 					map.setCenter(locPosition);
 					marker.setMap(map);
+					ps.keywordSearch('영화관', that.placesSearchCB);
 				});
 			} else {
 				alert('현재위치(geolocation)를 사용할수 없습니다.');
 			}
-		},
-		// 지도 불러오기2
-		addScript() {
-			/* global kakao */
-			const script = document.createElement('script');
-			script.onload = () => kakao.maps.load(this.initMap);
-			script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${this.mapKey}`;
-			document.head.appendChild(script);
 		},
 	},
 };
