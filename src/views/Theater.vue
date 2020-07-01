@@ -34,8 +34,16 @@ export default {
 			const container = document.getElementById('mapArea');
 			const options = { center: new kakao.maps.LatLng(33.450701, 126.570667), level: 3 };
 			const map = new kakao.maps.Map(container, options);
-			const ps = new kakao.maps.services.Places();
+			const places = new kakao.maps.services.Places();
 			const marker = new kakao.maps.Marker({ position: map.getCenter() });
+			const theaterList = [];
+			// eslint-disable-next-line func-names
+			const callback = function(result, status) {
+				if (status === kakao.maps.services.Status.OK) {
+					theaterList.push(result);
+					console.log('theaterList', theaterList);
+				}
+			};
 			const that = this;
 			if (navigator.geolocation) {
 				// GeoLocation을 이용해서 접속 위치를 얻어옵니다
@@ -67,7 +75,8 @@ export default {
 					// 지도 중심좌표를 접속위치로 변경합니다
 					map.setCenter(locPosition);
 					marker.setMap(map);
-					ps.keywordSearch('영화관', that.placesSearchCB);
+					places.keywordSearch('영화관', callback);
+					console.log('callback', callback);
 				});
 			} else {
 				alert('현재위치(geolocation)를 사용할수 없습니다.');
