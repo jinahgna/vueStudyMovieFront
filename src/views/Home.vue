@@ -7,16 +7,16 @@
 			</div>
 			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list" v-if="loadFinished">
 				<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
-					<a :href="rcmMovieData[index].items[0].link">
+					<a :href="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].link : ''">
 						<figure>
-							<img :src="rcmMovieData[index].items[0].image" alt="포스터 이미지" />
+							<img :src="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].image : ''" alt="포스터 이미지" />
 						</figure>
 						<span class="num point-color">{{ index + 1 }}</span>
 						<strong>{{ list.movieNm }}</strong>
 						<p>
 							개봉일 : {{ list.openDt }} <br />
 							누적관객수: {{ list.audiAcc }} <br />
-							평점: <span class="point-color">★{{ rcmMovieData[index].items[0].userRating }}</span>
+							평점: <span class="point-color">★{{ rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].userRating : '' }}</span>
 						</p>
 					</a>
 				</swiper-slide>
@@ -38,7 +38,6 @@ export default {
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
-			link: '',
 			boMovieData: [],
 			rcmMovieData: [],
 			kmdbRcmMovieData: [],
@@ -87,10 +86,12 @@ export default {
 				this.boMovieData.push(this.boxOfficeData.dailyBoxOfficeList[i].movieNm);
 				if (this.boMovieData[i].includes('#')) {
 					this.boMovieData[i] = this.boMovieData[i].replace(/#/g, '');
+				} else if (this.boMovieData[i].includes(':익스텐디드')) {
+					this.boMovieData[i] = this.boMovieData[i].replace(/:익스텐디드/g, '');
 				}
 			}
-			this.boSearchMovie();
-			this.kmdbSearchMovie();
+			await this.boSearchMovie();
+			await this.kmdbSearchMovie();
 		},
 		// 날짜 포멧 변환 yyyymmdd 형태생성
 		getFormatDate(date) {
@@ -105,7 +106,7 @@ export default {
 			const payload = this.boMovieData;
 			await this.$store.dispatch(commonActionType.ACTION_BO_SEARCH_MOVIE, payload);
 			this.rcmMovieData = this.$store.state.movie.boSearchMovieData.result;
-			this.loadFinished = true;
+			this.loadFinished = this.rcmMovieData.length === 10;
 		},
 		async kmdbSearchMovie() {
 			const kmdbPayload = {
