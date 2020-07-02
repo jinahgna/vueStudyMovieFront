@@ -14,6 +14,7 @@ export default {
 	data() {
 		return {
 			mapKey: '1adb5927a691a043afeccb8a25ce1118',
+			asdf: '',
 		};
 	},
 	mounted() {
@@ -31,52 +32,61 @@ export default {
 		},
 		// 내 현위치 지도 그리기
 		initMap() {
+			const that = this;
 			const container = document.getElementById('mapArea');
 			const options = { center: new kakao.maps.LatLng(33.450701, 126.570667), level: 3 };
 			const map = new kakao.maps.Map(container, options);
 			const places = new kakao.maps.services.Places();
-			const marker = new kakao.maps.Marker({ position: map.getCenter() });
-			const theaterList = [];
-			// eslint-disable-next-line func-names
-			const callback = function(result, status) {
-				if (status === kakao.maps.services.Status.OK) {
-					theaterList.push(result);
-					console.log('theaterList', theaterList);
+			const displayMarker = function(makPosition, makMessage, location) {
+				// 마커를 생성합니다
+				const marker = new kakao.maps.Marker({
+					map: that.map,
+					position: makPosition,
+				});
+				const iwContent = makMessage; // 인포윈도우에 표시할 내용
+				const iwRemoveable = true;
+				// 인포윈도우를 생성합니다
+				const infowindow = new kakao.maps.InfoWindow({
+					content: iwContent,
+					removable: iwRemoveable,
+				});
+				marker.setMap(map);
+				if (location === 'myLocation') {
+					// 지도 중심좌표를 접속위치로 변경합니다
+					map.setCenter(makPosition);
+					// 인포윈도우를 마커위에 표시합니다
+					infowindow.open(map, marker);
+					console.log('내위치');
+				} else {
+					console.log('영화관');
 				}
 			};
-			const that = this;
 			if (navigator.geolocation) {
 				// GeoLocation을 이용해서 접속 위치를 얻어옵니다
-				// eslint-disable-next-line func-names
 				navigator.geolocation.getCurrentPosition(function(position) {
-					// 위도
+					// 위도, 경도
 					const lat = position.coords.latitude;
-					// 경도
 					const lon = position.coords.longitude;
 					// 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
 					const locPosition = new kakao.maps.LatLng(lat, lon);
 					// 인포윈도우에 표시될 내용입니다
 					const message = '<div style="padding:5px;">여기에 계신가요?!</div>';
 					// 마커와 인포윈도우를 표시합니다
-					const currentMarker = new kakao.maps.Marker({
-						map: that.map,
-						position: locPosition,
-					});
-					// 인포윈도우에 표시할 내용
-					const iwContent = message;
-					const iwRemoveable = true;
-					// 인포윈도우를 생성합니다
-					const infowindow = new kakao.maps.InfoWindow({
-						content: iwContent,
-						removable: iwRemoveable,
-					});
-					// 인포윈도우를 마커위에 표시합니다
-					infowindow.open(map, currentMarker);
-					// 지도 중심좌표를 접속위치로 변경합니다
-					map.setCenter(locPosition);
-					marker.setMap(map);
-					places.keywordSearch('영화관', callback);
-					console.log('callback', callback);
+					const callback = function(result, status) {
+						if (status === kakao.maps.services.Status.OK) {
+							that.asdf = result;
+							const bounds = new kakao.maps.LatLngBounds();
+							// eslint-disable-next-line no-plusplus
+							for (let i = 0; i < that.asdf.length; i++) {
+								displayMarker(new kakao.maps.LatLng(that.asdf[i].y, that.asdf[i].x), message, 'theaterLocation');
+								bounds.extend(new kakao.maps.LatLng(that.asdf[i].y, that.asdf[i].x));
+							}
+							map.setBounds(bounds);
+						}
+					};
+					const option = [{ radius: 5000 }];
+					places.keywordSearch('영화관', callback, option);
+					displayMarker(locPosition, message, 'myLocation');
 				});
 			} else {
 				alert('현재위치(geolocation)를 사용할수 없습니다.');
