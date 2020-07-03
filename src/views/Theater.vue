@@ -14,7 +14,7 @@ export default {
 	data() {
 		return {
 			mapKey: '1adb5927a691a043afeccb8a25ce1118',
-			asdf: '',
+			searchPosition: '',
 		};
 	},
 	mounted() {
@@ -45,19 +45,18 @@ export default {
 				});
 				const iwContent = makMessage; // 인포윈도우에 표시할 내용
 				const iwRemoveable = true;
-				// 인포윈도우를 생성합니다
+				// 인포윈도우를 생성합니다 (내위치, 검색목록)
 				const infowindow = new kakao.maps.InfoWindow({
 					content: iwContent,
 					removable: iwRemoveable,
 				});
-				marker.setMap(map);
+				map.setCenter(makPosition);
 				if (location === 'myLocation') {
-					// 지도 중심좌표를 접속위치로 변경합니다
-					map.setCenter(makPosition);
 					// 인포윈도우를 마커위에 표시합니다
 					infowindow.open(map, marker);
 					console.log('내위치');
 				} else {
+					marker.setMap(map);
 					console.log('영화관');
 				}
 			};
@@ -72,19 +71,20 @@ export default {
 					// 인포윈도우에 표시될 내용입니다
 					const message = '<div style="padding:5px;">여기에 계신가요?!</div>';
 					// 마커와 인포윈도우를 표시합니다
-					const callback = function(result, status) {
+					const callback = function(result, status, pagination) {
 						if (status === kakao.maps.services.Status.OK) {
-							that.asdf = result;
+							that.searchPosition = result;
 							const bounds = new kakao.maps.LatLngBounds();
 							// eslint-disable-next-line no-plusplus
-							for (let i = 0; i < that.asdf.length; i++) {
-								displayMarker(new kakao.maps.LatLng(that.asdf[i].y, that.asdf[i].x), message, 'theaterLocation');
-								bounds.extend(new kakao.maps.LatLng(that.asdf[i].y, that.asdf[i].x));
+							for (let i = 0; i < that.searchPosition.length; i++) {
+								displayMarker(new kakao.maps.LatLng(that.searchPosition[i].y, that.searchPosition[i].x), message, 'theaterLocation');
+								bounds.extend(new kakao.maps.LatLng(that.searchPosition[i].y, that.searchPosition[i].x));
 							}
+							console.log('result, status, pagination', result, status, pagination);
 							map.setBounds(bounds);
 						}
 					};
-					const option = [{ radius: 5000 }];
+					const option = { radius: 2000, location: locPosition };
 					places.keywordSearch('영화관', callback, option);
 					displayMarker(locPosition, message, 'myLocation');
 				});
