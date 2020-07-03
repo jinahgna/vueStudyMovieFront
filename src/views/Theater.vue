@@ -1,7 +1,8 @@
 <template>
 	<div class="theater">
+		<p class="info-txt"><span>※</span> 영화관 목록은 가까운 위치순으로 정렬</p>
 		<div id="mapArea"></div>
-		<div id="menu_wrap">
+		<div id="wrapPlacesList">
 			<ul id="placesList"></ul>
 		</div>
 	</div>
@@ -49,6 +50,7 @@ export default {
 				});
 				// 인포윈도우를 생성 (내위치)
 				const infowindowMyPosition = new kakao.maps.InfoWindow({
+					zIndex: 1,
 					content: makMessage,
 					removable: true,
 				});
@@ -71,7 +73,7 @@ export default {
 					// geolocation으로 얻어온 내 위치 좌표로 생성
 					const locPosition = new kakao.maps.LatLng(lat, lon);
 					// 인포윈도우(내위치)에 표시되는 내용
-					const message = '<div style="padding:5px;">여기에 계신가요?!</div>';
+					const message = '<div style="padding:5px">여기에 계신가요?!</div>';
 					// 인포윈도우를 생성 (영화관 목록)
 					const infowindowTheater = new kakao.maps.InfoWindow({
 						zIndex: 1,
@@ -112,7 +114,7 @@ export default {
 					const getListItem = function(index, placess) {
 						const el = document.createElement('li');
 						// eslint-disable-next-line no-useless-concat
-						const itemStr = `<span>${placess.place_name}</span>	`;
+						const itemStr = `<p style="padding:10px 10px 10px 20px; border-bottom: 1px dashed #ccc;"><strong style="display:block; padding-bottom:5px; font-weight:700; font-size:14px;"> <span style="color:#e74c3c; margin-left:-15px; padding-right:8px;">${index + 1}</span>${placess.place_name}</strong>${placess.address_name}<br/><a href="tel:${placess.phone}" style="display:block; padding-top:5px; color:#e74c3c;">${placess.phone}</a></p>	`;
 						el.innerHTML = itemStr;
 						el.className = 'item';
 						return el;
@@ -125,7 +127,7 @@ export default {
 					};
 					const displayPlaces = function(displayPlace) {
 						const listEl = document.getElementById('placesList');
-						const menuEl = document.getElementById('menu_wrap');
+						const menuEl = document.getElementById('wrapPlacesList');
 						const fragment = document.createDocumentFragment();
 						const bounds = new kakao.maps.LatLngBounds();
 						const listStr = '';
@@ -180,7 +182,7 @@ export default {
 						}
 					};
 					// 영화관 검색 범위 옵션
-					const option = { radius: 2000, location: locPosition };
+					const option = { radius: 2000, location: locPosition, sort: 'distance' };
 					places.keywordSearch('영화관', callback, option);
 					displayMarker(locPosition, message, 'myLocation');
 				});
@@ -193,10 +195,32 @@ export default {
 </script>
 
 <style scoped>
+.info-txt {
+	background-color: #fff;
+	padding: 15px;
+	font-size: 13px;
+	text-align: left;
+}
+.info-txt span {
+	color: #e74c3c;
+}
 #mapArea {
 	width: 100%;
-	height: 500px;
+	height: calc(50vh - 55px);
 	margin: auto;
 	color: #000;
+}
+#wrapPlacesList {
+	max-height: calc(50vh - 70px);
+	overflow-y: auto;
+	text-align: left;
+	font-weight: 400;
+	padding: 10px;
+	background-color: #fff;
+	font-size: 13px;
+}
+.item {
+	display: block;
+	border-bottom: 1px solid #3c3c3c;
 }
 </style>

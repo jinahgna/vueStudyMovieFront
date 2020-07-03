@@ -12,8 +12,7 @@
 							<img v-bind:src="list.image" alt="" />
 						</figure>
 						<div class="info-txt">
-							<strong v-html="list.title"></strong>
-							<span>{{ list.subtitle }}</span> <br />
+							<strong v-html="list.title"></strong><br />
 							<span>{{ list.pubDate }}</span>
 							<p>{{ list.actor }}</p>
 							<p>{{ list.director }}</p>
@@ -22,6 +21,9 @@
 					</a>
 				</li>
 			</ul>
+			<div class="text-no-list" v-if="textNoList">
+				검색하신 영화 정보를 찾을 수 없습니다.
+			</div>
 		</div>
 	</div>
 </template>
@@ -37,6 +39,8 @@ export default {
 		return {
 			searchText: '',
 			searchMovieData: '',
+			movieData: '',
+			textNoList: false,
 		};
 	},
 	methods: {
@@ -53,6 +57,19 @@ export default {
 			};
 			await this.$store.dispatch(commonActionType.ACTION_SEARCH_MOVIE, payload);
 			this.searchMovieData = this.$store.state.movie.searchMovieData.result;
+			if (this.searchMovieData.display === 0) {
+				this.textNoList = true;
+			} else {
+				this.textNoList = false;
+				// eslint-disable-next-line no-plusplus
+				// for (let i = 0; i < this.searchMovieData.items.length; i++) {
+				// 	this.movieData.push(this.searchMovieData.items[i]);
+				// 	this.movieData[i].actor = this.searchMovieData.items[i].actor.substring(0, this.searchMovieData.items[i].actor.length - 1);
+				// 	this.movieData[i].director = this.searchMovieData.items[i].director.substring(0, this.searchMovieData.items[i].director.length - 1);
+				// 	console.log('this.searchMovieData.items.length', this.searchMovieData.items.length);
+				// 	console.log('this.movieData[i].actor', this.movieData[i].actor);
+				// }
+			}
 		},
 	},
 };
@@ -60,6 +77,12 @@ export default {
 
 <style scoped>
 .info-txt .point-color {
+	color: #e74c3c;
+}
+.text-no-list {
+	font-size: 12px;
+	padding-bottom: 40px;
+	font-weight: 200;
 	color: #e74c3c;
 }
 .search-area {
@@ -92,6 +115,7 @@ ul li {
 }
 ul li a {
 	display: flex;
+	align-items: center;
 	color: #fff;
 }
 ul li figure {
