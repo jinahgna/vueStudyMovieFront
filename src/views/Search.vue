@@ -124,8 +124,26 @@ ul li figure {
 	background-color: #fff;
 }
 ul li img {
+	position: relative;
 	max-width: 110px;
 	min-height: 60px;
+}
+ul li img:after {
+	content: '이미지 준비중';
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	font-size: 11px;
+	font-weight: 200;
+	color: #989898;
+	text-align: center;
+	padding-top: 22%;
+	clear: both;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	background-color: #3a1515;
 }
 .info-txt {
 	width: calc(100% - 120px);

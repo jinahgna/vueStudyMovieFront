@@ -1,9 +1,24 @@
 <template>
 	<div class="theater">
-		<p class="info-txt"><span>※</span> 영화관 목록은 가까운 위치순으로 정렬</p>
-		<div id="mapArea"></div>
+		<div class="wrap-map">
+			<p class="info-txt">
+				<span>※</span> 영화관 목록은 가까운 위치순으로 정렬됩니다.<br />
+				<span>※</span> 영화관 이름을 클릭하면 위치가 표시됩니다.
+			</p>
+			<div id="mapArea"></div>
+		</div>
 		<div id="wrapPlacesList">
 			<ul id="placesList"></ul>
+		</div>
+		<h2>영화 예매하러가기</h2>
+		<div class="link-banner">
+			<a href="http://www.cgv.co.kr/ticket/">CGV</a>
+		</div>
+		<div class="link-banner">
+			<a href="https://www.megabox.co.kr/booking">MEGABOX</a>
+		</div>
+		<div class="link-banner">
+			<a href="https://www.lottecinema.co.kr/NLCHS/Ticketing">LOTTE CINEMA</a>
 		</div>
 	</div>
 </template>
@@ -195,32 +210,71 @@ export default {
 </script>
 
 <style scoped>
+.wrap-map {
+	width: 100%;
+	height: 280px;
+	position: fixed;
+	left: 0;
+	top: 55px;
+	border-bottom: 1px solid #ccc;
+}
 .info-txt {
 	background-color: #fff;
 	padding: 15px;
-	font-size: 13px;
+	font-size: 11px;
 	text-align: left;
+	line-height: 1.4;
 }
 .info-txt span {
 	color: #e74c3c;
 }
 #mapArea {
 	width: 100%;
-	height: calc(50vh - 55px);
+	height: 220px;
 	margin: auto;
 	color: #000;
 }
 #wrapPlacesList {
-	max-height: calc(50vh - 70px);
-	overflow-y: auto;
+	padding: 290px 10px 0;
 	text-align: left;
 	font-weight: 400;
-	padding: 10px;
 	background-color: #fff;
 	font-size: 13px;
 }
 .item {
 	display: block;
 	border-bottom: 1px solid #3c3c3c;
+}
+/* banner */
+h2 {
+	text-align: left;
+	padding: 20px;
+	color: #fff;
+}
+.link-banner {
+	margin-bottom: 10px;
+}
+.link-banner a {
+	display: block;
+	position: relative;
+	background-color: #e74c3c;
+	font-size: 13px;
+	text-align: left;
+	color: #fff;
+	padding: 20px;
+	line-height: 1.5;
+}
+.link-banner a:after {
+	content: '';
+	display: block;
+	position: absolute;
+	right: 25px;
+	top: 50%;
+	margin-top: -8px;
+	width: 15px;
+	height: 15px;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
+	transform: rotate(-45deg);
 }
 </style>

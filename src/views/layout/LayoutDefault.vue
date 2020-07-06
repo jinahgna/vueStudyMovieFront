@@ -5,7 +5,9 @@
 			<a href="/search">SEARCH<br />MOVIE</a>
 			<a href="/theater">LOCATION<br />THEATER</a>
 		</div>
-		<router-view></router-view>
+		<div class="content">
+			<router-view></router-view>
+		</div>
 		<div class="footer">
 			Copyright ⓒ 2020 by Gna All Rights Reserved.
 		</div>
@@ -18,10 +20,20 @@
 	padding-bottom: 50px;
 }
 .header {
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 10;
 	display: flex;
+	width: 100%;
+	box-sizing: border-box;
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 20px;
+	background-color: #000;
+}
+.content {
+	padding-top: 55px;
 }
 .footer {
 	position: absolute;

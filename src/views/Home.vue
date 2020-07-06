@@ -1,26 +1,49 @@
 <template>
 	<div class="movie">
 		<div class="wrap-boxoffice">
-			<h2>BoxOffice Top10</h2>
 			<div class="loader-box" v-if="!loadFinished">
 				<div class="loader"></div>
 			</div>
-			<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list" v-if="loadFinished">
-				<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
-					<a :href="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].link : ''">
-						<figure>
-							<img :src="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].image : ''" alt="포스터 이미지" />
-						</figure>
-						<span class="num point-color">{{ index + 1 }}</span>
-						<strong>{{ list.movieNm }}</strong>
-						<p>
-							개봉일 : {{ list.openDt }} <br />
-							누적관객수: {{ list.audiAcc }} <br />
-							평점: <span class="point-color">★{{ rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].userRating : '' }}</span>
-						</p>
-					</a>
-				</swiper-slide>
-			</swiper>
+			<div class="wrap-movie-slider" v-if="loadFinished">
+				<h2>BoxOffice Top10</h2>
+				<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list">
+					<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
+						<a :href="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].link : ''">
+							<figure>
+								<img :src="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].image : ''" alt="포스터 이미지" />
+							</figure>
+							<span class="num point-color">{{ index + 1 }}</span>
+							<strong>{{ list.movieNm }}</strong>
+							<p>
+								개봉일 : {{ list.openDt }} <br />
+								누적관객수: {{ list.audiAcc }} <br />
+								평점: <span class="point-color">★{{ rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].userRating : '' }}</span>
+							</p>
+						</a>
+					</swiper-slide>
+				</swiper>
+				<h2>장르별 영화 추천</h2>
+				<div class="wrap-movie-genre" v-for="(list, index01) in kmdbRcmMovieData" :key="index01">
+					<h3 class="point-color">{{ kmdbPayload[index01] }}</h3>
+					<swiper :options="swiperOption02" ref="mySwiper" class="theme-movie-list">
+						<swiper-slide v-for="(list02, index02) in kmdbRcmMovieData[index01]" :key="index02">
+							<a :href="list02.kmdbUrl">
+								<figure>
+									<img :src="kmdbRcmMoviePoster[index01][index02]" alt="포스터 이미지" />
+								</figure>
+								<strong>{{ list02.title }}</strong>
+							</a>
+						</swiper-slide>
+					</swiper>
+				</div>
+				<h2>영화제 바로가기</h2>
+				<div class="link-banner">
+					<a href="https://www.biff.kr/kor/">부산국제영화제 BIFF <br />2020.10.07~10.16</a>
+				</div>
+				<div class="link-banner">
+					<a href="http://www.bifan.kr/">부천국제판타스틱영화제 BIFAN <br />2020.07.09~07.16</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -40,7 +63,9 @@ export default {
 			todayDate: '',
 			boMovieData: [],
 			rcmMovieData: [],
+			kmdbPayload: ['드라마', '액션', '코메디'],
 			kmdbRcmMovieData: [],
+			kmdbRcmMoviePoster: [],
 			swiperOption: {
 				effect: 'coverflow',
 				grabCursor: true,
@@ -55,6 +80,11 @@ export default {
 				autoplay: {
 					delay: 2000,
 				},
+			},
+			swiperOption02: {
+				slidesPerView: 3.5,
+				spaceBetween: 10,
+				autoplay: false,
 			},
 		};
 	},
@@ -109,12 +139,22 @@ export default {
 			this.loadFinished = this.rcmMovieData.length === 10;
 		},
 		async kmdbSearchMovie() {
-			const kmdbPayload = {
-				genre: '드라마',
-			};
-			await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, kmdbPayload);
-			this.kmdbRcmMovieData = this.$store.state.movie.kmdbSearchMovieData.result.Data[0].Result;
-			// console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
+			await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, this.kmdbPayload);
+			this.kmdbRcmMoviePoster = { 0: [], 1: [], 2: [] };
+			// eslint-disable-next-line no-plusplus
+			for (let i = 0; i < this.$store.state.movie.kmdbSearchMovieData.result.length; i++) {
+				this.kmdbRcmMovieData.push(this.$store.state.movie.kmdbSearchMovieData.result[i].Data[0].Result);
+				// eslint-disable-next-line no-plusplus
+				for (let j = 0; j < this.kmdbRcmMovieData[i].length; j++) {
+					this.kmdbRcmMoviePoster[i].push(this.kmdbRcmMovieData[i][j].posters);
+					if (this.kmdbRcmMoviePoster[i][j].includes('|')) {
+						const idx = this.kmdbRcmMoviePoster[i][j].indexOf('|');
+						this.kmdbRcmMoviePoster[i][j] = this.kmdbRcmMoviePoster[i][j].substring(0, idx);
+					}
+				}
+			}
+			console.log('this.kmdbRcmMoviePoster', this.kmdbRcmMoviePoster);
+			console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
 		},
 	},
 };
@@ -160,7 +200,8 @@ export default {
 .boxoffice-list {
 	padding-top: 35px;
 }
-.boxoffice-list a {
+.boxoffice-list a,
+.theme-movie-list a {
 	display: block;
 	width: 100%;
 	color: #fff;
@@ -181,9 +222,6 @@ export default {
 	border: 1px solid #ddd;
 	top: 5px;
 	left: 5px;
-}
-.boxoffice-list .swiper-slide-active figure {
-	/* border: 2px solid #fff; */
 }
 .boxoffice-list img {
 	width: 110px;
@@ -216,6 +254,82 @@ img {
 }
 .point-color {
 	color: #e74c3c;
+}
+/* theme movie list */
+.theme-movie-list {
+	padding: 0 20px;
+}
+.wrap-movie-genre + .wrap-movie-genre h3 {
+	margin-top: 20px;
+}
+.theme-movie-list strong {
+	font-weight: 200;
+	font-size: 12px;
+}
+.wrap-movie-slider h2:first-of-type {
+	padding: 0 20px 10px;
+}
+.wrap-movie-slider h2 {
+	padding: 40px 20px 10px;
+}
+.wrap-movie-slider h3 {
+	display: inline-block;
+	border: 1px solid #e74c3c;
+	padding: 3px 5px;
+	font-weight: 700;
+	font-size: 12px;
+	margin: 0 20px 10px;
+}
+.theme-movie-list .swiper-slide {
+	padding: 0;
+}
+.theme-movie-list img {
+	position: relative;
+	width: 100%;
+	height: 35vw;
+}
+.theme-movie-list img:after {
+	content: '이미지 준비중';
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	font-size: 11px;
+	font-weight: 200;
+	color: #989898;
+	text-align: center;
+	padding-top: 30px;
+	clear: both;
+	width: 100%;
+	height: 35vw;
+	box-sizing: border-box;
+	background-color: #3a1515;
+}
+/* banner */
+.link-banner {
+	margin-bottom: 10px;
+}
+.link-banner a {
+	display: block;
+	position: relative;
+	background-color: #e74c3c;
+	font-size: 13px;
+	color: #fff;
+	padding: 20px;
+	line-height: 1.5;
+}
+.link-banner a:after {
+	content: '';
+	display: block;
+	position: absolute;
+	right: 25px;
+	top: 50%;
+	margin-top: -8px;
+	width: 15px;
+	height: 15px;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
+	transform: rotate(-45deg);
 }
 /* loading animation */
 .loader-box {
