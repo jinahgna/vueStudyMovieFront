@@ -9,13 +9,13 @@
 				<li v-for="(list, index) in searchMovieData.items" :key="index">
 					<a v-bind:href="list.link">
 						<figure>
-							<img v-bind:src="list.image" alt="" />
+							<img v-if="list.image !== ''" v-bind:src="list.image" alt="" />
 						</figure>
 						<div class="info-txt">
 							<strong v-html="list.title"></strong><br />
 							<span>{{ list.pubDate }}</span>
-							<p>{{ list.actor }}</p>
-							<p>{{ list.director }}</p>
+							<p>{{ list.actor.substring(0, list.actor.length - 1) }}</p>
+							<p>{{ list.director.substring(0, list.director.length - 1) }}</p>
 							<p class="point-color">★{{ list.userRating }}</p>
 						</div>
 					</a>
@@ -38,13 +38,13 @@ export default {
 	data() {
 		return {
 			searchText: '',
-			searchMovieData: '',
-			movieData: '',
+			searchMovieData: [],
+			movieData: [],
 			textNoList: false,
 		};
 	},
 	methods: {
-		// 영화검색 api 호출
+		// 영화검색 네이버 api 호출
 		async searchMovie() {
 			const payload = {
 				query: this.searchText,
@@ -61,14 +61,6 @@ export default {
 				this.textNoList = true;
 			} else {
 				this.textNoList = false;
-				// eslint-disable-next-line no-plusplus
-				// for (let i = 0; i < this.searchMovieData.items.length; i++) {
-				// 	this.movieData.push(this.searchMovieData.items[i]);
-				// 	this.movieData[i].actor = this.searchMovieData.items[i].actor.substring(0, this.searchMovieData.items[i].actor.length - 1);
-				// 	this.movieData[i].director = this.searchMovieData.items[i].director.substring(0, this.searchMovieData.items[i].director.length - 1);
-				// 	console.log('this.searchMovieData.items.length', this.searchMovieData.items.length);
-				// 	console.log('this.movieData[i].actor', this.movieData[i].actor);
-				// }
 			}
 		},
 	},
@@ -119,16 +111,18 @@ ul li a {
 	color: #fff;
 }
 ul li figure {
+	position: relative;
 	width: 110px;
 	margin-right: 10px;
-	background-color: #fff;
+	min-height: 60px;
 }
 ul li img {
 	position: relative;
+	z-index: 1;
 	max-width: 110px;
 	min-height: 60px;
 }
-ul li img:after {
+ul li figure:after {
 	content: '이미지 준비중';
 	display: block;
 	position: absolute;
@@ -144,6 +138,7 @@ ul li img:after {
 	height: 100%;
 	box-sizing: border-box;
 	background-color: #3a1515;
+	border: 1px solid #3a1515;
 }
 .info-txt {
 	width: calc(100% - 120px);

@@ -1,16 +1,16 @@
 <template>
 	<div class="movie">
 		<div class="wrap-boxoffice">
-			<div class="loader-box" v-if="!loadFinished">
+			<div class="loader-box" v-if="!loadFinished01 || !loadFinished02">
 				<div class="loader"></div>
 			</div>
-			<div class="wrap-movie-slider" v-if="loadFinished">
+			<div class="wrap-movie-slider" v-if="loadFinished01 && loadFinished02">
 				<h2>BoxOffice Top10</h2>
 				<swiper :options="swiperOption" ref="mySwiper" class="boxoffice-list">
 					<swiper-slide v-for="(list, index) in boxOfficeData.dailyBoxOfficeList" :key="index">
-						<a :href="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].link : ''">
+						<a v-bind:href="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].link : ''">
 							<figure>
-								<img :src="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].image : ''" alt="포스터 이미지" />
+								<img v-bind:src="rcmMovieData[index].items[0] ? rcmMovieData[index].items[0].image : ''" alt="포스터 이미지" />
 							</figure>
 							<span class="num point-color">{{ index + 1 }}</span>
 							<strong>{{ list.movieNm }}</strong>
@@ -27,9 +27,9 @@
 					<h3 class="point-color">{{ kmdbPayload[index01] }}</h3>
 					<swiper :options="swiperOption02" ref="mySwiper" class="theme-movie-list">
 						<swiper-slide v-for="(list02, index02) in kmdbRcmMovieData[index01]" :key="index02">
-							<a :href="list02.kmdbUrl">
+							<a v-bind:href="list02.kmdbUrl">
 								<figure>
-									<img :src="kmdbRcmMoviePoster[index01][index02]" alt="포스터 이미지" />
+									<img v-if="kmdbRcmMoviePoster[index01][index02] !== ''" v-bind:src="kmdbRcmMoviePoster[index01][index02]" alt="" />
 								</figure>
 								<strong>{{ list02.title }}</strong>
 							</a>
@@ -57,7 +57,8 @@ export default {
 	components: {},
 	data() {
 		return {
-			loadFinished: false,
+			loadFinished01: false,
+			loadFinished02: false,
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
@@ -82,7 +83,7 @@ export default {
 				},
 			},
 			swiperOption02: {
-				slidesPerView: 3.5,
+				slidesPerView: 3.2,
 				spaceBetween: 10,
 				autoplay: false,
 			},
@@ -132,12 +133,14 @@ export default {
 			day = day >= 10 ? day : `0${day}`;
 			return `${year}${month}${day}`;
 		},
+		// 추출한 박스오피스 영화 title로 네이버 검색 api 호출하여 이미지 가져오기
 		async boSearchMovie() {
 			const payload = this.boMovieData;
 			await this.$store.dispatch(commonActionType.ACTION_BO_SEARCH_MOVIE, payload);
 			this.rcmMovieData = this.$store.state.movie.boSearchMovieData.result;
-			this.loadFinished = this.rcmMovieData.length === 10;
+			this.loadFinished01 = this.rcmMovieData.length === 10;
 		},
+		// 장르별 추천 영화 kmdb 오픈api 데이터 호출
 		async kmdbSearchMovie() {
 			await this.$store.dispatch(commonActionType.ACTION_KMDB_SEARCH_MOVIE, this.kmdbPayload);
 			this.kmdbRcmMoviePoster = { 0: [], 1: [], 2: [] };
@@ -153,6 +156,7 @@ export default {
 					}
 				}
 			}
+			this.loadFinished02 = this.$store.state.movie.kmdbSearchMovieData.result.length === 3;
 			console.log('this.kmdbRcmMoviePoster', this.kmdbRcmMoviePoster);
 			console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
 		},
@@ -283,12 +287,17 @@ img {
 .theme-movie-list .swiper-slide {
 	padding: 0;
 }
+.theme-movie-list figure {
+	position: relative;
+	height: 35vw;
+}
 .theme-movie-list img {
 	position: relative;
+	z-index: 1;
 	width: 100%;
 	height: 35vw;
 }
-.theme-movie-list img:after {
+.theme-movie-list figure:after {
 	content: '이미지 준비중';
 	display: block;
 	position: absolute;
@@ -345,7 +354,7 @@ img {
 	height: 20px;
 }
 .loader:after {
-	content: 'LOADING ...';
+	content: '영화정보 LOADING...';
 	color: #fff;
 	font-weight: 200;
 	font-size: 14px;
