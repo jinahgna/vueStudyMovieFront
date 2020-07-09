@@ -27,7 +27,8 @@
 					<h3 class="point-color">{{ kmdbPayload[index01] }}</h3>
 					<swiper :options="swiperOption02" ref="mySwiper" class="theme-movie-list">
 						<swiper-slide v-for="(list02, index02) in kmdbRcmMovieData[index01]" :key="index02">
-							<a v-bind:href="list02.kmdbUrl">
+							<!-- <a v-bind:href="list02.kmdbUrl"> -->
+							<a @click="popupMovieDetail(list02)">
 								<figure>
 									<img v-if="kmdbRcmMoviePoster[index01][index02] !== ''" v-bind:src="kmdbRcmMoviePoster[index01][index02]" alt="" />
 								</figure>
@@ -45,20 +46,50 @@
 				</div>
 			</div>
 		</div>
+		<!-- START : popupMovieDetail -->
+		<popupMovieDetail v-if="popupActive" @popupEvent="popupMovieDetail">
+			<strong slot="p-movie-title" class="p-movie-title"> {{ this.popupDetail.title }}<br />{{ this.popupDetail.titleEng }}</strong>
+			<dl slot="p-movie-genre" class="p-movie-genre">
+				<dt>장르</dt>
+				<dd>{{ this.popupDetail.genre }}</dd>
+			</dl>
+			<dl slot="p-movie-director" class="p-movie-director">
+				<dt>감독</dt>
+				<dd>
+					<span>{{ this.popupDetail.directors.director[0].directorNm }}</span>
+				</dd>
+			</dl>
+			<dl slot="p-movie-actor" class="p-movie-actor">
+				<dt>배우</dt>
+				<dd>
+					<span v-for="(list, index) in popupDetail.actors.actor" :key="index">{{ list.actorNm }}</span>
+				</dd>
+			</dl>
+			<p slot="p-movie-desc" class="p-movie-desc">
+				{{ this.popupDetail.plots.plot[0].plotText }}
+			</p>
+			<a v-bind:href="this.popupDetail.kmdbUrl" slot="p-movie-link" class="p-movie-link">자세히 보러가기</a>
+		</popupMovieDetail>
+		<!-- END : popupMovieDetail -->
 	</div>
 </template>
 
 <script>
 import commonMutationType from '@/store/mutationsType';
 import commonActionType from '@/store/actionsType';
+import popupMovieDetail from '@/components/popup/popupMovieDetail';
 
 export default {
 	name: 'Home',
-	components: {},
+	components: {
+		// eslint-disable-next-line vue/no-unused-components
+		popupMovieDetail,
+	},
 	data() {
 		return {
 			loadFinished01: false,
 			loadFinished02: false,
+			popupActive: false,
 			boxOfficekey: 'b12f2221d401b22dda7ce6f92ea46fbb',
 			boxOfficeData: '',
 			todayDate: '',
@@ -67,6 +98,7 @@ export default {
 			kmdbPayload: ['드라마', '액션', '코메디'],
 			kmdbRcmMovieData: [],
 			kmdbRcmMoviePoster: [],
+			popupDetail: [],
 			swiperOption: {
 				effect: 'coverflow',
 				grabCursor: true,
@@ -159,6 +191,15 @@ export default {
 			this.loadFinished02 = this.$store.state.movie.kmdbSearchMovieData.result.length === 3;
 			console.log('this.kmdbRcmMoviePoster', this.kmdbRcmMoviePoster);
 			console.log('this.kmdbRcmMovieData', this.kmdbRcmMovieData);
+		},
+		popupMovieDetail(data) {
+			if (data === 'popupClose') {
+				this.popupActive = false;
+			} else {
+				this.popupActive = true;
+				this.popupDetail = data;
+			}
+			console.log('data', data);
 		},
 	},
 };
@@ -417,5 +458,15 @@ img {
 		opacity: 0;
 		width: 0px;
 	}
+}
+/* popup */
+.p-movie-title {
+	color: #000;
+}
+.p-movie-title,
+.p-movie-director {
+	display: block;
+}
+.p-movie-actor {
 }
 </style>
