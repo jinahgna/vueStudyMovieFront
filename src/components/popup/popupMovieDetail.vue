@@ -40,16 +40,20 @@ export default {
 	left: 0;
 	z-index: 10;
 	background-color: #fff;
-	padding: 20px;
+	padding: 30px 30px 20px;
 	width: 100%;
+	text-align: left;
 	box-sizing: border-box;
 	border-radius: 20px 20px 0 0;
+	border-top: 5px solid #e74c3c;
+	border-left: 5px solid #e74c3c;
+	border-right: 5px solid #e74c3c;
 }
 .btn-close {
 	display: inline-block;
 	position: absolute;
-	right: 10px;
-	top: 10px;
+	right: 20px;
+	top: 13px;
 	font-size: 20px;
 	color: #000;
 }

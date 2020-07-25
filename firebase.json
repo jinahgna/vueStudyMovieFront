@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "moviefront",
+    "site": "moviefrontstudy",
     "public": "dist",
     "ignore": [
       "firebase.json",

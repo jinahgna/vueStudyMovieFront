@@ -9,7 +9,7 @@ import Theater from '@/views/Theater';
 // const HomeCodeSplit = () => import(/* webpackChunkName: "homeView" */ '@/views/HomeCodeSplit');
 
 const pageGroup1 = [
-	{ path: '/home', name: 'homeViewDefault', component: Home },
+	{ path: '/', name: 'homeViewDefault', component: Home },
 	{ path: '/search', name: 'Search', component: Search },
 	{ path: '/theater', name: 'Theater', component: Theater },
 	// { path: '/home/homeView2', name: 'homeViewCodeSplit', component: HomeCodeSplit },

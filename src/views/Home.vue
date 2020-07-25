@@ -48,19 +48,19 @@
 		</div>
 		<!-- START : popupMovieDetail -->
 		<popupMovieDetail v-if="popupActive" @popupEvent="popupMovieDetail">
-			<strong slot="p-movie-title" class="p-movie-title"> {{ this.popupDetail.title }}<br />{{ this.popupDetail.titleEng }}</strong>
+			<strong slot="p-movie-title" class="p-movie-title"> {{ this.popupDetail.title }} {{ this.popupDetail.titleEng }}</strong>
 			<dl slot="p-movie-genre" class="p-movie-genre">
-				<dt>장르</dt>
+				<dt>장르:</dt>
 				<dd>{{ this.popupDetail.genre }}</dd>
 			</dl>
 			<dl slot="p-movie-director" class="p-movie-director">
-				<dt>감독</dt>
+				<dt>감독:</dt>
 				<dd>
 					<span>{{ this.popupDetail.directors.director[0].directorNm }}</span>
 				</dd>
 			</dl>
 			<dl slot="p-movie-actor" class="p-movie-actor">
-				<dt>배우</dt>
+				<dt>배우:</dt>
 				<dd>
 					<span v-for="(list, index) in popupDetail.actors.actor" :key="index">{{ list.actorNm }}</span>
 				</dd>
@@ -461,12 +461,44 @@ img {
 }
 /* popup */
 .p-movie-title {
-	color: #000;
-}
-.p-movie-title,
-.p-movie-director {
 	display: block;
+	color: #000;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px dashed #e6a69f;
 }
+.p-movie-genre,
+.p-movie-director,
 .p-movie-actor {
+	display: flex;
+	align-items: baseline;
+	font-size: 12px;
+}
+.p-movie-genre dt,
+.p-movie-director dt,
+.p-movie-actor dt {
+	flex: 0 0 auto;
+	width: 37px;
+}
+.p-movie-genre dd,
+.p-movie-director dd,
+.p-movie-actor dd {
+	line-height: 1.5;
+}
+.p-movie-desc {
+	padding-top: 10px;
+	margin-top: 10px;
+	border-top: 1px dashed #e6a69f;
+	font-size: 12px;
+	line-height: 1.5;
+}
+.p-movie-link {
+	display: inline-block;
+	border-radius: 15px;
+	color: #e74c3c;
+	border: 1px solid #e74c3c;
+	padding: 5px 10px;
+	margin: 20px auto 10px;
+	font-size: 12px;
 }
 </style>

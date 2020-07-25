@@ -1,7 +1,7 @@
 <template>
 	<div class="layoutDefault">
 		<div class="header">
-			<a href="/home"><img src="@/assets/iconLogo.png" alt="아이콘로고"/></a>
+			<a href="/"><img src="@/assets/iconLogo.png" alt="아이콘로고"/></a>
 			<a href="/search">SEARCH<br />MOVIE</a>
 			<a href="/theater">LOCATION<br />THEATER</a>
 		</div>
